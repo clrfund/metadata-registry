@@ -1,0 +1,61 @@
+"""
+Metadata Registry
+"""
+type MetadataEntry @entity {
+  "Concatenation of network, transaction hash and logIndex"
+  id: ID!
+  "msg.sender"
+  owner: Bytes!
+  "metadata in JSON formatted string"
+  metadata: String
+  "metadata permissions"
+  permissions: [Permission!] @derivedFrom(field: "metadata")
+
+  "metadata creation time"  
+  createdAt: BigInt!
+  "metadata last updated time"
+  lastUpdatedAt: BigInt
+}
+
+"""
+Metadata Permissions
+"""
+type Permission @entity {
+  "concatenation of metadataId and account"
+  id: ID!
+  "metadata with this permission"
+  metadata: MetadataEntry!
+  "account granted with this permission"
+  account: Bytes!
+  "create metadata permission"
+  create: Boolean!
+  "update metadata permission"
+  update: Boolean!
+  "delete metadata permission"
+  delete: Boolean!
+  "allow to set permission"
+  permissions: Boolean!
+
+  createdAt: BigInt!
+  lastUpdatedAt: BigInt
+}
+
+"""
+Error contains metadata processing errors
+"""
+type Error @entity {
+  "Concatenation of transaction hash and logIndex"
+  id: ID!
+  "NewPost event content input"
+  content: String
+  "error message"
+  errorMessage: String
+  "transaction hash"
+  txHash: Bytes!
+  "event log index"
+  logIndex: BigInt!
+  "msg.sender"
+  msgSender: Bytes!
+  "transaction timestamp"
+  timestamp: BigInt!
+}

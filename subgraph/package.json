@@ -1,0 +1,29 @@
+{
+  "name": "@clrfund/metadata-subgraph",
+  "version": "1.0.0",
+  "private": true,
+  "keywords": [
+    "clr.fund",
+    "metadata",
+    "registry"
+  ],
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "prepare-rinkeby": "mustache config/rinkeby.json subgraph.template.yaml > subgraph.yaml",
+    "deploy-rinkeby": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ yuetloo/metadata-rinkeby --access-token $GRAPHKEY"
+  },
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
+    "eslint": "^8.7.0",
+    "eslint-config-prettier": "^8.3.0",
+    "mustache": "^4.2.0"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.26.0",
+    "@graphprotocol/graph-ts": "^0.24.1",
+    "as-string-sink": "^0.5.0"
+  }
+}

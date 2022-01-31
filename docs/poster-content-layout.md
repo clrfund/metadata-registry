@@ -121,10 +121,10 @@ After registering a metadata, the owner can grant permissions to other accounts 
 | target             | String | metadata id generated from metadata creation |
 | accounts           | Array  | array of addresses to grants the permissions to |
 | permissions        | Object | each property in this object specifies what permissions to grant |
-|                    |         | create - create metadata|
-|                    |        | update - update metadata|
-|                    |        | delete - delete metadata|
-|                    |        | permissions - grant permissions on the metadata |
+|                    |        | create: true - allow to create metadata|
+|                    |        | update: true - allow to update metadata|
+|                    |        | delete: true - allow to delete metadata|
+|                    |        | permissions: true - allow to grant permissions on the metadata |
 |                    |        | if the permissions property is not defined, all metadata permissions will be revoked from the accounts|
 
 Sample:

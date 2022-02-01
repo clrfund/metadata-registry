@@ -2,3 +2,5 @@ node_modules
 subgraph.yaml
 generated
 build
+yarn-error.log
+package-lock.json

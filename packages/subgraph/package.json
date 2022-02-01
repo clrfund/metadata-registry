@@ -10,6 +10,8 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
+    "lint:js": "eslint 'src/*.ts'",
+    "lint": "yarn lint:js",
     "prepare-rinkeby": "mustache config/rinkeby.json subgraph.template.yaml > subgraph.yaml",
     "deploy-rinkeby": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ yuetloo/metadata-rinkeby --access-token $GRAPHKEY"
   },
@@ -19,7 +21,8 @@
     "@typescript-eslint/parser": "^5.10.1",
     "eslint": "^8.7.0",
     "eslint-config-prettier": "^8.3.0",
-    "mustache": "^4.2.0"
+    "mustache": "^4.2.0",
+    "typescript": "^4.5.5"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.26.0",

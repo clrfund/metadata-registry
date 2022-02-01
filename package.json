@@ -1,0 +1,26 @@
+{
+  "name": "@clrfund/metadata-registry",
+  "version": "1.0.0",
+  "description": "Registry of metadata",
+  "private": true,
+  "lint-staged": {
+    "**/*.{js,ts,json,scss,css,vue}": [
+      "prettier --write"
+    ]
+  },
+  "scripts": {
+    "bootstrap": "yarn && lerna bootstrap",
+    "lint": "lerna run lint --parallel",
+    "prepare": "husky install",
+    "build-subgraph": "lerna run --scope=@clrfund/metadata-subgraph build",
+    "codegen-subgraph": "lerna run --scope=@clrfund/metadata-subgraph codegen",
+    "prepare-subgraph:rinkeby": "lerna run --scope=@clrfund/metadata-subgraph prepare-rinkeby",
+    "deploy-subgraph:rinkeby": "lerna run --scope=@clrfund/metadata-subgraph deploy-rinkeby"
+  },
+  "devDependencies": {
+    "husky": "^7.0.0",
+    "lerna": "^4.0.0",
+    "lint-staged": "^12.3.2",
+    "prettier": "^2.5.1"
+  }
+}

@@ -40,7 +40,7 @@ export class MetadataComposer {
   }
 
   /**
-   * Run a subgraph query
+   * Run a subgraph query against one or more networks and merges the results
    * @param queryString graphql query
    * @param args arguments to pass to the query
    * @returns query result

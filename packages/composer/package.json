@@ -1,0 +1,38 @@
+{
+  "name": "@clrfund/composer",
+  "version": "1.0.0",
+  "description": "Subgraph composition",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "keywords": [
+    "subgraph",
+    "clr.fund",
+    "quadratic",
+    "funding"
+  ],
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/clrfund/metadata-registry#readme",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clrfund/metadata-registry.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clrfund/metadata-registry/issues"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "jest": "^27.4.7",
+    "ts-jest": "^27.1.3",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "@urql/core": "^2.4.1",
+    "graphql": "^16.3.0",
+    "isomorphic-unfetch": "^3.1.0"
+  }
+}

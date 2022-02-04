@@ -12,6 +12,7 @@
     "bootstrap": "yarn && lerna bootstrap",
     "lint": "lerna run lint --parallel",
     "prepare": "husky install",
+    "test": "lerna run test",
     "build-subgraph": "lerna run --scope=@clrfund/metadata-subgraph build",
     "codegen-subgraph": "lerna run --scope=@clrfund/metadata-subgraph codegen",
     "prepare-subgraph:rinkeby": "lerna run --scope=@clrfund/metadata-subgraph prepare-rinkeby",

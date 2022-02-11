@@ -10,19 +10,47 @@ const urls = ['https://api.thegraph.com/subgraphs/name/yuetloo/metadata-rinkeby'
 const composer = new MetadataComposer(urls)
 
 const query = '{ metadataEntries{id} }'
-const result = await composer.query(query)
-console.log(result.data)
-//
-//    {
-//      metadataEntries: [
-//        {
-//          __typename: 'MetadataEntry',
-//          id: 'rinkeby-0x123...456-59'
-//        }
-//      ]
-//    }
-//
+const { data, error } = await composer.query(query)
+if( data } {
+  console.log(data)
+  // On success, the data field will be available
+  // with the following content based on the example:
+  //    {
+  //      metadataEntries: [
+  //        {
+  //          __typename: 'MetadataEntry',
+  //          id: 'rinkeby-0x123...456-59'
+  //        }
+  //      ]
+  //    }
+  //
+}
+
+if( error ) {
+  console.log(error)
+  //  if there's error, the error field will be available
+  //  with sample error like this:
+  //    CombinedError {
+  //      name: 'CombinedError',
+  //      message: '[GraphQL] No value provided for required argument: `id`',
+  //      graphQLErrors: [
+  //         GraphQLError: No value provided for required argument: `id`
+  //        ... stack trace ...
+  //      ]
+  //      networkError: undefined,
+  //      response: Response {
+  //         url: 'https://api.thegraph.com/subgraphs/name/...',
+  //         status: 200,
+  //         statusText: 'OK',
+  //         headers: [Headers]
+  //         counter: 0
+  //      }
+  //   }
+  //
+}
+
 ```
+
 
 ## Limitations
 

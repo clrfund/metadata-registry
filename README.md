@@ -25,7 +25,7 @@ Content of the metadata will not be verified as the registry is designed to be g
 
 See subgraph entity definitions: [/packages/subgraph/schema.graphql](./packages/subgraph/schema.graphql).
 
-Subgraph [UML](/packages/subgraph/subgraphUML.png)
+See subgraph UML: [/packages/subgraph/subgraphUML.png](/packages/subgraph/subgraphUML.png)
 
 ## Composer
 A library that merges subgraph results from different networks.

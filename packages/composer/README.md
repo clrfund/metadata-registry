@@ -13,8 +13,6 @@ const query = '{ metadataEntries{id} }'
 const { data, error } = await composer.query(query)
 if( data } {
   console.log(data)
-  // On success, the data field will be available
-  // with the following content based on the example:
   //    {
   //      metadataEntries: [
   //        {
@@ -28,8 +26,7 @@ if( data } {
 
 if( error ) {
   console.log(error)
-  //  if there's error, the error field will be available
-  //  with sample error like this:
+  //  [
   //    CombinedError {
   //      name: 'CombinedError',
   //      message: '[GraphQL] No value provided for required argument: `id`',
@@ -46,6 +43,7 @@ if( error ) {
   //         counter: 0
   //      }
   //   }
+  // ]
   //
 }
 

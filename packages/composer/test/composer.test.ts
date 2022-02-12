@@ -1,6 +1,6 @@
-import { OperationResult, Operation } from '@urql/core'
+import { OperationResult, Operation, CombinedError } from '@urql/core'
 import { MetadataComposer } from '../src'
-import { merge } from '../src/MetadataComposer'
+import { merge, hasError, mapError } from '../src/MetadataComposer'
 import { Source, parse } from 'graphql'
 
 const urls = [
@@ -129,11 +129,23 @@ describe('MetadataComposer', () => {
       }
     }`
 
-    const badUrl = 'https://api.thegraph.com/subgraphs/name/bad'
+    const badUrl = [
+      'https://api.thegraph.com/subgraphs/name/bad',
+      'https://bad-url.com',
+    ]
 
     const composer = new MetadataComposer(urls.concat(badUrl))
     const result = await composer.query(query)
     expect(result.error).toBeDefined
+    expect(result.error).toHaveLength(2)
+    expect(result.error).toEqual([
+      expect.objectContaining({
+        message: expect.any(String),
+      }),
+      expect.objectContaining({
+        message: expect.any(String),
+      }),
+    ])
     expect(result.data).toBeUndefined
   })
 
@@ -149,5 +161,53 @@ describe('MetadataComposer', () => {
     const composer = new MetadataComposer(urls)
     const result = await composer.query(query, args)
     expect(result).toEqual({ data: { metadataEntries: [] } })
+  })
+
+  test('hasError with empty array', () => {
+    expect(hasError([])).toEqual(false)
+  })
+
+  test('hasError with array of data', () => {
+    expect(hasError([{ operation: createOperation(1), data: '1' }])).toEqual(
+      false
+    )
+  })
+
+  test('hasError with array of 1 error', () => {
+    expect(
+      hasError([
+        { operation: createOperation(1), error: new CombinedError({}) },
+      ])
+    ).toEqual(true)
+  })
+
+  test('hasError with array of data and error', () => {
+    expect(
+      hasError([
+        {
+          operation: createOperation(1),
+          data: 'data',
+          error: new CombinedError({}),
+        },
+      ])
+    ).toEqual(true)
+  })
+
+  test('mapError with an Error input', () => {
+    const error = new Error('test')
+    expect(mapError(error)).toEqual({ error: [error] })
+  })
+
+  test('mapError with query result', () => {
+    expect(mapError([{ operation: createOperation(1), data: 'test' }])).toEqual(
+      {}
+    )
+  })
+
+  test('mapError with query result containing error', () => {
+    const error = new Error('test')
+    expect(mapError([{ operation: createOperation(1), error }])).toEqual({
+      error: [error],
+    })
   })
 })

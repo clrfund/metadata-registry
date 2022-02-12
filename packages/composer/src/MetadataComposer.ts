@@ -19,6 +19,30 @@ export function merge(result: OperationResult<any, any>[]): any {
   return { data }
 }
 
+// this function is only exported for testing purposes
+export function hasError(result: OperationResult<any, any>[]): boolean {
+  return !!result.find((el) => el.error)
+}
+
+/**
+ *
+ * this function is only exported for testing purposes
+ * @param result
+ * @returns
+ */
+export function mapError(result: OperationResult<any, any>[] | unknown): any {
+  if (Array.isArray(result)) {
+    return result.reduce((acc, el) => {
+      if (el.error) {
+        acc.error = (acc.error || []).concat(el.error)
+      }
+      return acc
+    }, {})
+  } else {
+    return { error: [result] }
+  }
+}
+
 /**
  * @class MetadataComposer
  */
@@ -50,11 +74,14 @@ export class MetadataComposer {
       this.clients.map((client) => client.query(queryString, args).toPromise())
     )
 
-    const error = queryResult.find((res) => res.error)
-    if (error) {
-      return error
+    if (hasError(queryResult)) {
+      return mapError(queryResult)
     }
 
-    return merge(queryResult)
+    try {
+      return merge(queryResult)
+    } catch (err) {
+      return mapError(err)
+    }
   }
 }

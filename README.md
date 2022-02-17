@@ -23,10 +23,13 @@ Subgraph is used to track the state of metadata by indexing events logged throug
 
 Content of the metadata will not be verified as the registry is designed to be generic and can accept any metadata. It is the Dapp's responsibility to verify metadata.
 
-See subgraph entity definitions: [/subgraph/schema.graphql](./subgraph/schema.graphql).
+See subgraph entity definitions: [/packages/subgraph/schema.graphql](./packages/subgraph/schema.graphql).
 
+See subgraph UML: [/packages/subgraph/subgraphUML.png](/packages/subgraph/subgraphUML.png)
 
-
+## Composer
+A library that merges subgraph results from different networks.
+See [/packages/composer/README.md](/packages/composer/README.md) for more details.
 
 
 

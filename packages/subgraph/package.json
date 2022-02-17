@@ -1,6 +1,6 @@
 {
   "name": "@clrfund/metadata-subgraph",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "private": true,
   "keywords": [
     "clr.fund",
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "codegen": "graph codegen",
-    "build": "graph build",
+    "build-subgraph": "graph build",
     "lint:js": "eslint 'src/*.ts'",
     "lint": "yarn lint:js",
     "prepare-rinkeby": "mustache config/rinkeby.json subgraph.template.yaml > subgraph.yaml",

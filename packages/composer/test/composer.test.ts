@@ -210,4 +210,50 @@ describe('MetadataComposer', () => {
       error: [error],
     })
   })
+
+  test('search with no result', async () => {
+    const composer = new MetadataComposer(urls)
+    const { data } = await composer.search('xxxx')
+    expect(data).toEqual([])
+  })
+
+  test('search with result', async () => {
+    const composer = new MetadataComposer(urls)
+    const { data } = await composer.search('name')
+    expect(data).toBeTruthy()
+  })
+
+  test('search with activeOnly option', async () => {
+    const composer = new MetadataComposer(urls)
+    const { data } = await composer.search('name', { activeOnly: true })
+    expect(data).toBeTruthy()
+  })
+
+  test('search with error', async () => {
+    const badUrl = 'https://api.thegraph.com/subgraphs'
+    const composer = new MetadataComposer([badUrl])
+    const { error } = await composer.search('name', { activeOnly: true })
+    expect(error).toBeTruthy()
+  })
+
+  test('get() with invalid id', async () => {
+    const composer = new MetadataComposer(urls)
+    const { data } = await composer.get('rinkeby')
+    expect(data).toBeFalsy()
+  })
+
+  test('get() with valid id', async () => {
+    const composer = new MetadataComposer(urls)
+    const id =
+      'rinkeby-0x45af16a2ceb668f92a74e8132814e4e6cd96aaf2544e600adccd7b7efcd785a7-59'
+    const { data } = await composer.get(id)
+    expect(data).toBeTruthy()
+  })
+
+  test('get() with error', async () => {
+    const badUrl = 'https://api.thegraph.com/subgraphs'
+    const composer = new MetadataComposer([badUrl])
+    const { error } = await composer.get('xxx')
+    expect(error).toBeTruthy()
+  })
 })

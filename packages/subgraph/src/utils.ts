@@ -55,3 +55,8 @@ export function getType(data: JSONValue): string | null {
 export function getAction(data: JSONValue): string | null {
   return getString(data, 'action')
 }
+
+export function getTarget(data: JSONValue): string {
+  let target = getString(data, 'target')
+  return target ? target : ''
+}

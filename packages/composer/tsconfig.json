@@ -2,7 +2,9 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "module": "commonjs"
   },
-  "include": ["./src", "./test"]
+  "include": ["./src", "./test"],
+  "files": ["./hardhat.config.ts"]
 }

@@ -2,7 +2,8 @@ import { createClient, Client, OperationResult } from '@urql/core'
 import fetch from 'isomorphic-unfetch'
 import { SearchOptions, MetadataResult } from './types'
 import { buildSearchQuery } from './utils'
-import { SEARCH_FIRST, GET_METADATA_QUERY } from './constants'
+import { SEARCH_FIRST, GET_METADATA_QUERY, POSTER, Action } from './constants'
+import { ContractTransaction, providers, Contract } from 'ethers'
 
 /**
  * Merge an array of subgraph query results from different networks
@@ -51,19 +52,16 @@ export function mapError(result: OperationResult<any, any>[] | unknown): any {
  */
 export class MetadataComposer {
   clients: Client[]
-  urls: string[]
+  posterAddress: string
 
   /**
    * @param urls subgraph urls
-   *
+   * @posterAddress address of the poster address, default POSTER.ADDRESS
    * @constructor
    */
-  constructor(urls: string[]) {
-    this.urls = urls
-    this.clients = []
-    for (let i = 0; i < urls.length; i++) {
-      this.clients.push(createClient({ url: urls[i], fetch }))
-    }
+  constructor(urls: string[] = [], posterAddress?: string) {
+    this.clients = urls.map((url) => createClient({ url, fetch }))
+    this.posterAddress = posterAddress || POSTER.ADDRESS
   }
 
   /**
@@ -162,5 +160,79 @@ export class MetadataComposer {
       // this should not happen as subgraph handles the error
       return { error }
     }
+  }
+
+  /**
+   * Create a metadata entry in the registry
+   * @param metadata metadata to add
+   * @param provider EIP1193 web3 provider
+   * @returns the added transaction
+   */
+  async create(metadata: any, provider: any): Promise<ContractTransaction> {
+    const web3Provider = new providers.Web3Provider(provider)
+    const signer = web3Provider.getSigner()
+    const contract = new Contract(this.posterAddress, POSTER.ABI, signer)
+    const content = {
+      content: [
+        {
+          ...metadata,
+          action: Action.create,
+          type: POSTER.METADATA_TYPE,
+        },
+      ],
+    }
+
+    return contract.post(JSON.stringify(content), POSTER.METADATA_TAG)
+  }
+
+  /**
+   * Update a metadata in the registry
+   * @param metadata metadata to update
+   * @param provider EIP1193 web3 provider
+   * @returns the updated transaction
+   */
+  async update(metadata: any, provider: any): Promise<ContractTransaction> {
+    const web3Provider = new providers.Web3Provider(provider)
+    const signer = web3Provider.getSigner()
+    const contract = new Contract(this.posterAddress, POSTER.ABI, signer)
+
+    const content = {
+      content: [
+        {
+          ...metadata,
+          action: Action.update,
+          type: POSTER.METADATA_TYPE,
+          target: metadata.id,
+        },
+      ],
+    }
+
+    return contract.post(JSON.stringify(content), POSTER.METADATA_TAG)
+  }
+
+  /**
+   * Mark a metadata as deleted in the registry
+   * @param metadataId metadata id to delete
+   * @param provider EIP1193 provider
+   * @returns the delete transaction
+   */
+  async delete(
+    metadataId: string,
+    provider: any
+  ): Promise<ContractTransaction> {
+    const web3Provider = new providers.Web3Provider(provider)
+    const signer = web3Provider.getSigner()
+    const contract = new Contract(this.posterAddress, POSTER.ABI, signer)
+    const content = {
+      content: [
+        {
+          target: metadataId,
+          action: Action.delete,
+          type: POSTER.METADATA_TYPE,
+        },
+      ],
+    }
+
+    return contract.post(JSON.stringify(content), POSTER.METADATA_TAG)
   }
 }

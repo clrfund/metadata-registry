@@ -1,9 +1,15 @@
-import { JSONValue, JSONValueKind } from '@graphprotocol/graph-ts'
+import { dataSource, JSONValue, JSONValueKind } from '@graphprotocol/graph-ts'
 import { NewPost as NewPostEvent } from '../generated/Poster/Poster'
 import { Result } from './Result'
 import { json } from './json'
 import { MetadataEntry } from '../generated/schema'
-import { buildMetadataId, getAction, getTarget, getType } from './utils'
+import {
+  buildMetadataId,
+  getAction,
+  getTarget,
+  getType,
+  getName,
+} from './utils'
 
 enum ActionType {
   CREATE = 1,
@@ -75,9 +81,16 @@ export class MetadataRegistrar {
   }
 
   registerMetadata(data: JSONValue): Result {
-    let id = buildMetadataId(this._event)
+    let network = dataSource.network()
+    let msgSender = this._event.transaction.from
+    let name = getName(data)
+    if (!name) {
+      return new Result('Metadata name missing')
+    }
+    let id = buildMetadataId(network, msgSender, name!)
     let entry = new MetadataEntry(id)
-    entry.owner = this._event.transaction.from
+    entry.owner = msgSender
+    entry.network = network
 
     entry.metadata = json.stringify(data, replacer)
     entry.createdAt = this._event.block.timestamp

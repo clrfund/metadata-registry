@@ -71,6 +71,7 @@ export function getTarget(data: JSONValue): string {
   return target ? target : ''
 }
 
-export function getName(data: JSONValue): string | null {
-  return getString(data, 'name')
+export function getName(data: JSONValue): string {
+  let name = getString(data, 'name')
+  return name ? name.trim() : ''
 }

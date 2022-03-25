@@ -17,8 +17,13 @@ enum ActionType {
   DELETE = 3,
 }
 
+// keys to be filtered out of the metadata json object
+let filter = new Set<string>()
+filter.add('action')
+filter.add('type')
+
 function replacer(key: string, value: JSONValue): string | null {
-  if (key == 'type' || key == 'action') {
+  if (filter.has(key)) {
     return null
   }
   return json.stringify(value)
@@ -64,7 +69,7 @@ export class MetadataRegistrar {
   process(data: JSONValue): Result {
     let type = getType(data)
     if (type == 'permissions') {
-      return this.setMetadataPermissions(data)
+      return new Result('Processing of permissions type not implemented')
     } else if (type == 'metadata') {
       let action = getAction(data)
       if (action == 'create') {
@@ -88,7 +93,7 @@ export class MetadataRegistrar {
       return new Result('Missing metadata name')
     }
 
-    let id = buildMetadataId(network, msgSender, name!)
+    let id = buildMetadataId(network, msgSender, name)
     let entry = new MetadataEntry(id)
     entry.owner = msgSender
     entry.network = network
@@ -111,8 +116,17 @@ export class MetadataRegistrar {
       return new Result('Not authorized to update: ' + id)
     }
 
-    // TODO: merge instead of replace
-    entry.metadata = json.stringify(data, replacer)
+    let metadata = json.try_fromString(entry.metadata as string)
+    if (metadata.isError) {
+      return new Result('Error parsing metadata for id: ' + id)
+    }
+
+    let merged = json.try_mergeObject([metadata.value, data], filter)
+    if (merged.isError) {
+      return new Result('Error merging metadata:' + merged.error)
+    }
+
+    entry.metadata = json.stringifyTypedMap(merged.value)
     entry.lastUpdatedAt = this._event.block.timestamp
     entry.save()
     return new Result()
@@ -131,10 +145,6 @@ export class MetadataRegistrar {
 
     entry.deletedAt = this._event.block.timestamp
     entry.save()
-    return new Result()
-  }
-
-  setMetadataPermissions(data: JSONValue): Result {
     return new Result()
   }
 }

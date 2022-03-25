@@ -109,7 +109,7 @@ export class MetadataComposer {
     }
 
     const data = result.data.metadataEntries.map((entry: any) => {
-      const { id, owner, permissions } = entry
+      const { id, owner, permissions, network } = entry
       let metadata = {}
       try {
         metadata = JSON.parse(entry.metadata)
@@ -120,6 +120,7 @@ export class MetadataComposer {
         ...metadata,
         id,
         owner,
+        network,
         permissions,
       }
     })
@@ -145,13 +146,14 @@ export class MetadataComposer {
     }
 
     const [entry] = result.data.metadataEntries
-    const { owner, permissions } = entry
+    const { owner, permissions, network } = entry
     try {
       const metadata = JSON.parse(entry.metadata)
       const data = {
         ...metadata,
         id,
         owner,
+        network,
         permissions,
       }
 

@@ -4,6 +4,7 @@ export const SEARCH_FIRST = 10
 export const METADATA_FRAGMENT = `
   id
   owner
+  network
   metadata
   permissions {
     id

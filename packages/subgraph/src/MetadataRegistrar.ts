@@ -85,8 +85,9 @@ export class MetadataRegistrar {
     let msgSender = this._event.transaction.from
     let name = getName(data)
     if (!name) {
-      return new Result('Metadata name missing')
+      return new Result('Missing metadata name')
     }
+
     let id = buildMetadataId(network, msgSender, name!)
     let entry = new MetadataEntry(id)
     entry.owner = msgSender

@@ -10,7 +10,7 @@ import { StringSink } from 'as-string-sink'
 
 function serializeString(data: string): string {
   // @ts-ignore: replaceAll does not exist
-  return '"' + data.replaceAll('"', '\\"') + '"'
+  return '"' + data.replaceAll('"', '\\"').replaceAll('\\', '\\\\') + '"'
 }
 
 export namespace json {

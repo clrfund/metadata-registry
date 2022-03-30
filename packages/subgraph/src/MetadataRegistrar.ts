@@ -18,6 +18,8 @@ enum ActionType {
 }
 
 // keys to be filtered out of the metadata json object
+// the action and type are operational information, not
+// metadata information
 let filter = new Set<string>()
 filter.add('action')
 filter.add('type')
@@ -93,13 +95,22 @@ export class MetadataRegistrar {
       return new Result('Missing metadata name')
     }
 
+    // check if metadata exists and active
+    // if metadata was deleted, we'll allow this metadata
+    // to be created
     let id = buildMetadataId(network, msgSender, name)
-    let entry = new MetadataEntry(id)
+    let entry = MetadataEntry.load(id)
+    if (entry && entry.deletedAt === null) {
+      return new Result('Metadata ' + id + ' already exists')
+    }
+
+    entry = new MetadataEntry(id)
     entry.owner = msgSender
     entry.network = network
 
     entry.metadata = json.stringify(data, replacer)
     entry.createdAt = this._event.block.timestamp
+    entry.deletedAt = null
 
     entry.save()
     return new Result()
@@ -117,11 +128,12 @@ export class MetadataRegistrar {
     }
 
     let metadata = json.try_fromString(entry.metadata as string)
-    if (metadata.isError) {
-      return new Result('Error parsing metadata for id: ' + id)
-    }
 
-    let merged = json.try_mergeObject([metadata.value, data], filter)
+    // if there's error parsing existing metadata, we'll just
+    // update the entry with new metadata
+    let dataToMerge = metadata.isError ? [data] : [metadata.value, data]
+
+    let merged = json.try_mergeObject(dataToMerge, filter)
     if (merged.isError) {
       return new Result('Error merging metadata:' + merged.error)
     }

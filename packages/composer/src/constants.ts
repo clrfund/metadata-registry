@@ -11,6 +11,7 @@ export const METADATA_FRAGMENT = `
     update
     account
   }
+  deletedAt
 `
 
 export const GET_METADATA_QUERY = `query($id: String) {

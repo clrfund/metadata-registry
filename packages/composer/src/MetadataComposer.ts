@@ -109,19 +109,17 @@ export class MetadataComposer {
     }
 
     const data = result.data.metadataEntries.map((entry: any) => {
-      const { id, owner, permissions, network } = entry
+      const { id, metadata: metadataString, __typename, ...others } = entry
       let metadata = {}
       try {
-        metadata = JSON.parse(entry.metadata)
+        metadata = JSON.parse(metadataString)
       } catch (error) {
         metadata = { error }
       }
       return {
         ...metadata,
+        ...others,
         id,
-        owner,
-        network,
-        permissions,
       }
     })
 
@@ -140,27 +138,33 @@ export class MetadataComposer {
       return result
     }
 
-    if (result.data.metadataEntries.length === 0) {
+    if (
+      !result.data.metadataEntries ||
+      result.data.metadataEntries.length === 0
+    ) {
       // id not found
       return { data: null }
     }
 
     const [entry] = result.data.metadataEntries
-    const { owner, permissions, network } = entry
+    const { metadata: metadataString, __typename, ...others } = entry
     try {
-      const metadata = JSON.parse(entry.metadata)
+      const metadata = JSON.parse(metadataString)
       const data = {
         ...metadata,
+        ...others,
         id,
-        owner,
-        network,
-        permissions,
       }
 
       return { data }
     } catch (error) {
-      // this should not happen as subgraph handles the error
-      return { error }
+      // return as much data as we can if json failed to parse so that
+      // the metadata string can be updated
+      const data = {
+        ...others,
+        id,
+      }
+      return { error, data }
     }
   }
 

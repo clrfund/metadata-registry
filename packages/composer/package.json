@@ -1,7 +1,7 @@
 {
   "name": "@clrfund/metadata-composer",
   "version": "0.0.1",
-  "description": "Subgraph composition",
+  "description": "A library to manage project metadata",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@urql/core": "^2.4.1",
-    "graphql": "^16.3.0",
+    "graphql": "^15.5.1",
     "isomorphic-unfetch": "^3.1.0"
   }
 }

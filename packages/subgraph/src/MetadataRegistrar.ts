@@ -3,7 +3,13 @@ import { NewPost as NewPostEvent } from '../generated/Poster/Poster'
 import { Result } from './Result'
 import { json } from './json'
 import { MetadataEntry } from '../generated/schema'
-import { buildMetadataId, getAction, getType } from './utils'
+import { buildMetadataId, getAction, getTarget, getType } from './utils'
+
+enum ActionType {
+  CREATE = 1,
+  UPDATE = 2,
+  DELETE = 3,
+}
 
 function replacer(key: string, value: JSONValue): string | null {
   if (key == 'type' || key == 'action') {
@@ -17,6 +23,13 @@ export class MetadataRegistrar {
 
   constructor(event: NewPostEvent) {
     this._event = event
+  }
+
+  authorized(entry: MetadataEntry, action: ActionType): boolean {
+    // TODO: check granted permissions too
+    return (
+      this._event.transaction.from.toHexString() == entry.owner.toHexString()
+    )
   }
 
   parse(data: string): JSONValue[] | null {
@@ -74,10 +87,36 @@ export class MetadataRegistrar {
   }
 
   updateMetadata(data: JSONValue): Result {
+    let id = getTarget(data)
+    let entry = MetadataEntry.load(id)
+    if (!entry) {
+      return new Result('Metadata not found: ' + id)
+    }
+
+    if (!this.authorized(entry, ActionType.UPDATE)) {
+      return new Result('Not authorized to update: ' + id)
+    }
+
+    // TODO: merge instead of replace
+    entry.metadata = json.stringify(data, replacer)
+    entry.lastUpdatedAt = this._event.block.timestamp
+    entry.save()
     return new Result()
   }
 
   deleteMetadata(data: JSONValue): Result {
+    let id = getTarget(data)
+    let entry = MetadataEntry.load(id)
+    if (!entry) {
+      return new Result('Metadata not found: ' + id)
+    }
+
+    if (!this.authorized(entry, ActionType.DELETE)) {
+      return new Result('Not authorized to delete: ' + id)
+    }
+
+    entry.deletedAt = this._event.block.timestamp
+    entry.save()
     return new Result()
   }
 

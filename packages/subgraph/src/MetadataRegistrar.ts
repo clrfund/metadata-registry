@@ -1,9 +1,15 @@
-import { JSONValue, JSONValueKind } from '@graphprotocol/graph-ts'
+import { dataSource, JSONValue, JSONValueKind } from '@graphprotocol/graph-ts'
 import { NewPost as NewPostEvent } from '../generated/Poster/Poster'
 import { Result } from './Result'
 import { json } from './json'
 import { MetadataEntry } from '../generated/schema'
-import { buildMetadataId, getAction, getTarget, getType } from './utils'
+import {
+  buildMetadataId,
+  getAction,
+  getTarget,
+  getType,
+  getName,
+} from './utils'
 
 enum ActionType {
   CREATE = 1,
@@ -11,8 +17,15 @@ enum ActionType {
   DELETE = 3,
 }
 
+// keys to be filtered out of the metadata json object
+// the action and type are operational information, not
+// metadata information
+let filter = new Set<string>()
+filter.add('action')
+filter.add('type')
+
 function replacer(key: string, value: JSONValue): string | null {
-  if (key == 'type' || key == 'action') {
+  if (filter.has(key)) {
     return null
   }
   return json.stringify(value)
@@ -58,7 +71,7 @@ export class MetadataRegistrar {
   process(data: JSONValue): Result {
     let type = getType(data)
     if (type == 'permissions') {
-      return this.setMetadataPermissions(data)
+      return new Result('Processing of permissions type not implemented')
     } else if (type == 'metadata') {
       let action = getAction(data)
       if (action == 'create') {
@@ -75,12 +88,29 @@ export class MetadataRegistrar {
   }
 
   registerMetadata(data: JSONValue): Result {
-    let id = buildMetadataId(this._event)
-    let entry = new MetadataEntry(id)
-    entry.owner = this._event.transaction.from
+    let network = dataSource.network()
+    let msgSender = this._event.transaction.from
+    let name = getName(data)
+    if (!name) {
+      return new Result('Missing metadata name')
+    }
+
+    // check if metadata exists and active
+    // if metadata was deleted, we'll allow this metadata
+    // to be created
+    let id = buildMetadataId(network, msgSender, name)
+    let entry = MetadataEntry.load(id)
+    if (entry && entry.deletedAt === null) {
+      return new Result('Metadata ' + id + ' already exists')
+    }
+
+    entry = new MetadataEntry(id)
+    entry.owner = msgSender
+    entry.network = network
 
     entry.metadata = json.stringify(data, replacer)
     entry.createdAt = this._event.block.timestamp
+    entry.deletedAt = null
 
     entry.save()
     return new Result()
@@ -97,8 +127,18 @@ export class MetadataRegistrar {
       return new Result('Not authorized to update: ' + id)
     }
 
-    // TODO: merge instead of replace
-    entry.metadata = json.stringify(data, replacer)
+    let metadata = json.try_fromString(entry.metadata as string)
+
+    // if there's error parsing existing metadata, we'll just
+    // update the entry with new metadata
+    let dataToMerge = metadata.isError ? [data] : [metadata.value, data]
+
+    let merged = json.try_mergeObject(dataToMerge, filter)
+    if (merged.isError) {
+      return new Result('Error merging metadata:' + merged.error)
+    }
+
+    entry.metadata = json.stringifyTypedMap(merged.value)
     entry.lastUpdatedAt = this._event.block.timestamp
     entry.save()
     return new Result()
@@ -117,10 +157,6 @@ export class MetadataRegistrar {
 
     entry.deletedAt = this._event.block.timestamp
     entry.save()
-    return new Result()
-  }
-
-  setMetadataPermissions(data: JSONValue): Result {
     return new Result()
   }
 }

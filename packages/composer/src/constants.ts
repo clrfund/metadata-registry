@@ -4,12 +4,14 @@ export const SEARCH_FIRST = 10
 export const METADATA_FRAGMENT = `
   id
   owner
+  network
   metadata
   permissions {
     id
     update
     account
   }
+  deletedAt
 `
 
 export const GET_METADATA_QUERY = `query($id: String) {

@@ -5,6 +5,9 @@ Anyone can register a new metadata, the owner or authorized accounts can update 
 
 Any dApp can query and consume the metadata using the subgraph API.  For example, the [clr.fund](https://clr.fund/#/) app will use the metadata to populate the project page while adding a new project or viewing the project details.
 
+## Dependency
+The metadata registry depends on the Poster contract being deployed on the network that subgraph is indexing. If it's not deployed, use this [script](https://github.com/onPoster/contract/blob/main/scripts/deploy.js) to deploy it.
+
 ## How to Register a New Metadata
 To register a new metadata, simply call the `Poster.post()` function to log an event. The `Poster` contract has been deployed at the same address, `0x000000000000cd17345801aa8147b8D3950260FF`, on multiple EVM compatible networks using the [Singleton Factory](https://eips.ethereum.org/EIPS/eip-2470).
 

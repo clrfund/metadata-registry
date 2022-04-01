@@ -2,6 +2,7 @@ import { OperationResult, Operation, CombinedError } from '@urql/core'
 import { MetadataComposer } from '../src'
 import { merge, hasError, mapError } from '../src/MetadataComposer'
 import { Source, parse } from 'graphql'
+import { utils } from 'ethers'
 
 const urls = [
   'https://api.thegraph.com/subgraphs/name/yuetloo/metadata-rinkeby',
@@ -209,5 +210,57 @@ describe('MetadataComposer', () => {
     expect(mapError([{ operation: createOperation(1), error }])).toEqual({
       error: [error],
     })
+  })
+
+  test('search with no result', async () => {
+    const composer = new MetadataComposer(urls)
+    const { data } = await composer.search('xxxx')
+    expect(data).toEqual([])
+  })
+
+  test('search with result', async () => {
+    const composer = new MetadataComposer(urls)
+    const { data } = await composer.search('name')
+    expect(data).toBeTruthy()
+  })
+
+  test('search with activeOnly option', async () => {
+    const composer = new MetadataComposer(urls)
+    const { data } = await composer.search('name', { activeOnly: true })
+    expect(data).toBeTruthy()
+  })
+
+  test('search with error', async () => {
+    const badUrl = 'https://api.thegraph.com/subgraphs'
+    const composer = new MetadataComposer([badUrl])
+    const { error } = await composer.search('name', { activeOnly: true })
+    expect(error).toBeTruthy()
+  })
+
+  test('get() with invalid id', async () => {
+    const composer = new MetadataComposer(urls)
+    const { data } = await composer.get('rinkeby')
+    expect(data).toBeFalsy()
+  })
+
+  test('get() with valid id', async () => {
+    const composer = new MetadataComposer(urls)
+    const id =
+      '0xf43cc4fe645cf868695a8600a4d44d859a87661aefa8379b8aad0b97f3b93940'
+    const { data } = await composer.get(id)
+    expect(data).toBeTruthy()
+
+    const nameHash = utils.id(data.name)
+    const networkHash = utils.id(data.network)
+    const hashes = utils.hexConcat([networkHash, data.owner, nameHash])
+    const expectedId = utils.keccak256(hashes)
+    expect(expectedId).toEqual(id)
+  })
+
+  test('get() with error', async () => {
+    const badUrl = 'https://api.thegraph.com/subgraphs'
+    const composer = new MetadataComposer([badUrl])
+    const { error } = await composer.get('xxx')
+    expect(error).toBeTruthy()
   })
 })

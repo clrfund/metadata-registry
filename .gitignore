@@ -5,3 +5,4 @@ build
 dist
 yarn-error.log
 package-lock.json
+artifacts

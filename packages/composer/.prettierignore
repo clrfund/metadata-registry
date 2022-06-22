@@ -4,6 +4,7 @@ dist
 build
 node_modules
 yarn.lock
+artifacts
 
 # Log files
 npm-debug.log*

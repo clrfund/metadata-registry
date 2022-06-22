@@ -2,10 +2,12 @@
 Metadata Registry
 """
 type MetadataEntry @entity {
-  "Concatenation of network, transaction hash and logIndex"
+  "Concatenation of network, msgSender and metadata name"
   id: ID!
   "msg.sender"
   owner: Bytes!
+  "network of the data source, i.e. mainnet, rinkeby, etc"
+  network: String!
   "metadata in JSON formatted string"
   metadata: String
   "metadata permissions"
@@ -15,6 +17,8 @@ type MetadataEntry @entity {
   createdAt: BigInt!
   "metadata last updated time"
   lastUpdatedAt: BigInt
+  "metadata deleted time"
+  deletedAt: BigInt
 }
 
 """
